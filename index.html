@@ -1165,13 +1165,13 @@ function renderFunnel() {
                 colorTo: (c) => colors[c.dataset.data[c.dataIndex].to],
                 colorMode: 'gradient',
                 labels: {
-                    accept: 'CBT 링크 수락 (28명)',
-                    onboard: '온보딩 완료 (19명)',
-                    drop: '미완료 이탈 (9명)',
-                    both: '명함+AI 모두 (12명)',
-                    cardOnly: '명함만 업로드 (1명)',
-                    aiOnly: 'AI만 사용 (4명)',
-                    inactive: '비활성 (2명)',
+                    accept: 'CBT 링크 수락 (28명, 100%)',
+                    onboard: '온보딩 완료 (19명, 67.9%)',
+                    drop: '미완료 이탈 (9명, 32.1%)',
+                    both: '명함+AI 모두 (12명, 42.9%)',
+                    cardOnly: '명함만 업로드 (1명, 3.6%)',
+                    aiOnly: 'AI만 사용 (4명, 14.3%)',
+                    inactive: '비활성 (2명, 7.1%)',
                 },
                 color: colors,
                 size: 'max',
@@ -1204,6 +1204,7 @@ function renderFunnelBars() {
         {label:'수락→온보딩', rate: (19/28*100)},
         {label:'온보딩→명함 업로드', rate: (13/19*100)},
         {label:'명함 업로드→AI사용', rate: (12/13*100)},
+        {label:'온보딩→AI사용 (명함 미업로드 포함)', rate: (16/19*100)},
         {label:'수락→AI사용 (전체)', rate: (16/28*100)},
     ];
     window._charts.funnelBars = new Chart(ctx, {
@@ -1212,7 +1213,7 @@ function renderFunnelBars() {
             labels: stepConversions.map(s=>s.label),
             datasets: [{
                 data: stepConversions.map(s=>s.rate),
-                backgroundColor: ['#0549CCCC','#DE3D82CC','#0FB5AECC','#8B5CF6CC'],
+                backgroundColor: ['#0549CCCC','#DE3D82CC','#0FB5AECC','#F68511CC','#8B5CF6CC'],
                 borderRadius: 6,
             }]
         },
