@@ -217,6 +217,10 @@
         .badge-heavy { background:#EBF1FB; color:#0549CC; }
         .badge-medium { background:rgba(15,181,174,0.12); color:#0FB5AE; }
         .badge-light { background:rgba(246,133,17,0.12); color:#F68511; }
+        .badge-inactive { background:rgba(218,67,67,0.10); color:#DA4343; }
+        .inactive-row { opacity:0.7; }
+        .inactive-row:hover { opacity:1; }
+        .inactive-separator td { padding:12px 12px; font-size:11px; font-weight:700; color:var(--negative); text-transform:uppercase; letter-spacing:0.5px; border-bottom:2px solid rgba(218,67,67,0.2); background:rgba(218,67,67,0.03); }
 
         /* Insight Cards */
         .insight-row { display:grid; grid-template-columns:repeat(auto-fit, minmax(300px,1fr)); gap:var(--gap); margin-bottom:var(--gap); }
@@ -418,12 +422,12 @@
 
     <!-- TAB 5: SURVEY -->
     <div id="tab-survey" class="tab-content">
-        <div class="section-title">CBT 설문조사 결과 <span class="badge">6명 응답</span></div>
+        <div class="section-title">CBT 설문조사 결과 <span class="badge">7명 응답</span></div>
         <div class="kpi-row" id="survey-kpi"></div>
         <div class="chart-row">
             <div class="chart-container">
                 <h3>항목별 평균 점수</h3>
-                <div class="chart-desc">5점 만점 기준 평균 (6명 응답)</div>
+                <div class="chart-desc">5점 만점 기준 평균 (7명 응답)</div>
                 <canvas id="chart-survey-radar"></canvas>
             </div>
             <div class="chart-container">
@@ -530,6 +534,22 @@ const USERS = [
     {name:'이민용', queries:[0,0,0,0,0,0,0,0,3,0,0], segment:'Light', total:3, days:1, company:'스위스 연방 교육연구혁신청', linkedin:'https://www.linkedin.com/in/leeminyong/'},
 ];
 
+// CBT 링크 수락했으나 AI 미사용 (12명)
+const INACTIVE_USERS = [
+    {name:'김선우', company:'Digital Turbine', position:'퍼블리셔 영업 이사', onboarding:true, linkedin:'https://www.linkedin.com/in/davidseonwookim/'},
+    {name:'송기범', company:'크리앤비(비트플래닛)', position:'CFO', onboarding:true, linkedin:'https://www.linkedin.com/in/leo-kibeom-soung-096967119/'},
+    {name:'장민환', company:'KB 금융지주', position:'차장', onboarding:true, linkedin:'https://www.linkedin.com/in/%EB%AF%BC%ED%99%98-%EC%9E%A5-8b9b00295/'},
+    {name:'임민경', company:'-', position:'-', onboarding:true, linkedin:'https://www.linkedin.com/in/minkyeong-madeline-lim-49196a180/'},
+    {name:'백남정', company:'한국열린사이버대학교', position:'객원교수', onboarding:true, linkedin:'https://www.linkedin.com/in/teamor/'},
+    {name:'김수영', company:'위드포인츠', position:'Director', onboarding:false, linkedin:'https://www.linkedin.com/in/soo-young-kim-b19851149/'},
+    {name:'이다운', company:'코리아스타트업허브', position:'대표이사', onboarding:false, linkedin:'https://www.linkedin.com/in/dawoon2023/'},
+    {name:'김환', company:'올리브영', position:'CTO', onboarding:false, linkedin:'https://www.linkedin.com/in/hwank/'},
+    {name:'장성훈', company:'포웰파트너스', position:'대표이사', onboarding:false, linkedin:''},
+    {name:'조홍근', company:'키움프라이빗에쿼티', position:'PE운용역', onboarding:false, linkedin:''},
+    {name:'오경석', company:'엔라이튼', position:'재무기획', onboarding:false, linkedin:''},
+    {name:'정진호', company:'SKS프라이빗에쿼티', position:'PE운용역', onboarding:false, linkedin:''},
+];
+
 // Card upload data
 const UPLOADS = [
     {name:'윤성용', cards:9752},
@@ -576,7 +596,7 @@ const AGENT_LOG = {
     internalUsers: ['남승오', '정홍준', '신승민', '류고은', '심정훈', '이기범', '이우진']
 };
 
-// Survey data (6 respondents)
+// Survey data (7 respondents)
 const SURVEY = [
     {name:'최규민', date:'3/6', satisfaction:3, useful:2, aiAccuracy:1, aiTimeSave:'아니오', companyInfo:1, recommend:1, reuse:'아니오', interview:'예'},
     {name:'윤성용', date:'3/6', satisfaction:5, useful:5, aiAccuracy:5, aiTimeSave:'예', companyInfo:5, recommend:5, reuse:'예', interview:'예'},
@@ -769,6 +789,15 @@ function renderHeatmap() {
         html += `<td style="font-weight:700;color:#0549CC">${u.total}</td>`;
         html += `<td><span class="badge-segment ${segClass}">${u.segment}</span></td></tr>`;
     });
+    // Inactive users separator + rows
+    html += `<tr class="inactive-separator"><td colspan="${DAYS_SHORT.length + 3}">AI 미사용 참여자 (${INACTIVE_USERS.length}명) — CBT 링크 수락 후 챗봇 미이용</td></tr>`;
+    INACTIVE_USERS.forEach(u => {
+        const nameHtml = u.linkedin ? `<a href="${u.linkedin}" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;border-bottom:1px solid rgba(218,67,67,0.3)" title="LinkedIn 프로필">${u.name}</a>` : u.name;
+        html += `<tr class="inactive-row"><td class="user-name">${nameHtml}</td>`;
+        DAYS_SHORT.forEach(() => { html += `<td class="heat-0">-</td>`; });
+        html += `<td style="font-weight:700;color:var(--text-secondary)">0</td>`;
+        html += `<td><span class="badge-segment badge-inactive">${u.onboarding ? '온보딩만' : '미참여'}</span></td></tr>`;
+    });
     html += '</tbody></table>';
     container.innerHTML = html;
 }
@@ -844,6 +873,19 @@ function renderUserTable() {
             <td style="font-weight:700;color:#0549CC">${u.total}회</td>
             <td>${(u.total / u.days).toFixed(1)}회</td>
             <td>${upload ? upload.cards.toLocaleString() + '장' : '-'}</td>
+        </tr>`;
+    });
+    // Inactive users
+    html += `<tr class="inactive-separator"><td colspan="7">AI 미사용 참여자 (${INACTIVE_USERS.length}명)</td></tr>`;
+    INACTIVE_USERS.forEach(u => {
+        html += `<tr class="inactive-row">
+            <td style="font-weight:600">${u.linkedin ? `<a href="${u.linkedin}" target="_blank" rel="noopener" style="color:#DA4343;text-decoration:none;border-bottom:1px solid rgba(218,67,67,0.3)" title="LinkedIn 프로필">${u.name}</a>` : u.name}</td>
+            <td>${u.company}</td>
+            <td><span class="badge-segment badge-inactive">${u.onboarding ? '온보딩만' : '미참여'}</span></td>
+            <td>0일</td>
+            <td style="font-weight:700;color:var(--text-secondary)">0회</td>
+            <td>-</td>
+            <td>-</td>
         </tr>`;
     });
     html += '</tbody></table>';
