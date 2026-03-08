@@ -289,9 +289,22 @@
             .dashboard-header h1 { font-size:16px; }
             .dashboard-header .subtitle { font-size:10px; }
             .header-badge { font-size:10px; padding:4px 10px; }
-            .kpi-row { grid-template-columns:1fr; gap:8px; }
-            .kpi-card { padding:12px 14px; }
-            .kpi-value { font-size:20px; }
+            .kpi-row { grid-template-columns:1fr; gap:6px; }
+            .kpi-card {
+                padding:10px 14px;
+                display:grid;
+                grid-template-columns:auto 1fr auto;
+                grid-template-rows:auto auto;
+                gap:0 10px;
+                align-items:center;
+            }
+            .kpi-card .kpi-icon { grid-row:1/3; margin-bottom:0; width:32px; height:32px; font-size:16px; }
+            .kpi-card .kpi-label { grid-column:2; font-size:11px; margin-bottom:0; }
+            .kpi-card .kpi-value { grid-column:3; grid-row:1/3; font-size:20px; text-align:right; margin-bottom:0; }
+            .kpi-card .kpi-sub { grid-column:2; font-size:10px; }
+            .kpi-card .kpi-change { display:none; }
+            .kpi-card .kpi-progress { grid-column:1/4; margin-top:6px; }
+            .kpi-card .kpi-target { grid-column:1/4; font-size:10px; }
             .kpi-label { font-size:11px; }
             .kpi-sub { font-size:11px; }
             .tab-nav { gap:2px; padding:2px; }
@@ -861,15 +874,15 @@ function renderKPISummary() {
     const container = document.getElementById('kpi-summary');
     const totalQ = AI_QUERIES_DAILY.reduce((a,b)=>a+b,0);
     const cards = [
-        {label:'CBT 참여자', value:'28', sub:'50명 초대 중 링크 수락 (56%)', change:'Notion DB 기준', cls:'positive', color:'#0549CC'},
-        {label:'AI 사용자', value:'16', sub:`총 ${totalQ}건 질의 (인당 ${(totalQ/16).toFixed(1)}회)`, change:'57.1% of 외부 사용자', cls:'positive', color:'#DE3D82'},
-        {label:'명함 업로드', value:'56,436', sub:'13명 업로더 / 평균 4,341장', change:'13/28 참여 (46.4%)', cls:'positive', color:'#0FB5AE'},
-        {label:'온보딩 완료', value:'19', sub:'28명 중 19명 완료 (67.9%)', change:'9명 미완료', cls:'warning', color:'#F68511'},
-        {label:'설문 만족도', value:'3.57', sub:'5점 만점 / 7명 응답', change:'재사용 의향 85.7%', cls:'positive', color:'#8B5CF6'},
+        {label:'CBT 참여자', value:'28', sub:'50명 초대 중 링크 수락 (56%)', change:'Notion DB 기준', cls:'positive', color:'#0549CC', icon:'👥'},
+        {label:'AI 사용자', value:'16', sub:`총 ${totalQ}건 질의 (인당 ${(totalQ/16).toFixed(1)}회)`, change:'57.1% of 외부 사용자', cls:'positive', color:'#DE3D82', icon:'🤖'},
+        {label:'명함 업로드', value:'56,436', sub:'13명 업로더 / 평균 4,341장', change:'13/28 참여 (46.4%)', cls:'positive', color:'#0FB5AE', icon:'📇'},
+        {label:'온보딩 완료', value:'19', sub:'28명 중 19명 완료 (67.9%)', change:'9명 미완료', cls:'warning', color:'#F68511', icon:'✅'},
+        {label:'설문 만족도', value:'3.57', sub:'5점 만점 / 7명 응답', change:'재사용 의향 85.7%', cls:'positive', color:'#8B5CF6', icon:'⭐'},
     ];
     container.innerHTML = cards.map(c => `
         <div class="kpi-card">
-            <div class="kpi-icon" style="background:${c.color}20;color:${c.color}">${c.label.charAt(0)}</div>
+            <div class="kpi-icon" style="background:${c.color}20;color:${c.color}">${c.icon}</div>
             <div class="kpi-label">${c.label}</div>
             <div class="kpi-value" style="color:${c.color}">${c.value}</div>
             <div class="kpi-sub">${c.sub}</div>
