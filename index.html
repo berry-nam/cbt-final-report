@@ -1293,7 +1293,9 @@ function renderKPITargets() {
     container.innerHTML = KPIS.map(k => {
         const pct = Math.min(100, (k.actual / k.target) * 100);
         const achieved = k.actual >= k.target;
-        const color = achieved ? '#0549CC' : pct >= 50 ? '#E8A43D' : '#DA4343';
+        const color = k.unit === '점'
+            ? (k.actual > 4 ? '#0549CC' : k.actual > 3 ? '#E8A43D' : '#DA4343')
+            : (achieved ? '#0549CC' : pct >= 50 ? '#E8A43D' : '#DA4343');
         return `
         <div class="kpi-card">
             <div class="kpi-icon" style="font-size:24px">${k.icon}</div>
@@ -1309,8 +1311,10 @@ function renderKPITargets() {
 function renderKPIRadar() {
     const ctx = document.getElementById('chart-kpi-radar').getContext('2d');
     const achievementRates = KPIS.map(k => Math.min(150, (k.actual / k.target) * 100));
-    const kpiPtColor = r => r >= 100 ? '#0549CC' : r >= 50 ? '#E8A43D' : '#DA4343';
-    const kpiPtColors = achievementRates.map(kpiPtColor);
+    const kpiPtColors = KPIS.map((k, i) => {
+        if (k.unit === '점') return k.actual > 4 ? '#0549CC' : k.actual > 3 ? '#E8A43D' : '#DA4343';
+        return achievementRates[i] >= 100 ? '#0549CC' : achievementRates[i] >= 50 ? '#E8A43D' : '#DA4343';
+    });
     window._charts.kpiRadar = new Chart(ctx, {
         type: 'radar',
         data: {
