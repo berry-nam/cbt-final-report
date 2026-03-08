@@ -257,11 +257,79 @@
             border-top:1px solid var(--border); margin-top:24px;
         }
 
-        /* Responsive */
+        /* Responsive — Tablet */
         @media (max-width:768px) {
-            .kpi-row { grid-template-columns:repeat(2,1fr); }
-            .chart-row { grid-template-columns:1fr; }
-            .tab-nav { flex-wrap:wrap; }
+            .dashboard-container { padding:8px; }
+            .dashboard-header { padding:20px 16px; }
+            .dashboard-header h1 { font-size:18px; }
+            .dashboard-header .subtitle { font-size:11px; }
+            .kpi-row { grid-template-columns:repeat(2,1fr); gap:8px; }
+            .kpi-card { padding:14px 16px; }
+            .kpi-value { font-size:22px; }
+            .chart-row { grid-template-columns:1fr; gap:8px; }
+            .chart-container { padding:16px; }
+            .tab-nav { flex-wrap:wrap; gap:2px; padding:3px; }
+            .tab-btn { padding:8px 6px; font-size:11px; }
+            .insight-row { grid-template-columns:1fr; }
+            .insight-card { padding:16px; }
+            .section-title { font-size:14px; }
+            .verdict-box { padding:20px 16px; }
+            .verdict-box h2 { font-size:20px; }
+            .funnel-label { min-width:80px; font-size:11px; }
+            .funnel-stats { min-width:60px; font-size:11px; }
+            .funnel-bar { height:32px; font-size:11px; padding:0 10px; }
+            .funnel-arrow { padding-left:96px; font-size:10px; }
+            .qa-user-card { padding:14px 16px; }
+            .qa-group-insight { font-size:12px; }
+        }
+        /* Responsive — Mobile */
+        @media (max-width:480px) {
+            .dashboard-container { padding:6px; }
+            .dashboard-header { padding:16px 12px; flex-direction:column; align-items:flex-start; }
+            .dashboard-header h1 { font-size:16px; }
+            .dashboard-header .subtitle { font-size:10px; }
+            .header-badge { font-size:10px; padding:4px 10px; }
+            .kpi-row { grid-template-columns:1fr; gap:8px; }
+            .kpi-card { padding:12px 14px; }
+            .kpi-value { font-size:20px; }
+            .kpi-label { font-size:11px; }
+            .kpi-sub { font-size:11px; }
+            .tab-nav { gap:2px; padding:2px; }
+            .tab-btn { padding:7px 4px; font-size:10px; min-width:0; }
+            .chart-container { padding:12px; }
+            .chart-container h3 { font-size:13px; }
+            .chart-container canvas { max-height:220px; }
+            .chart-container.tall canvas { max-height:280px; }
+            .section-title { font-size:13px; margin:16px 0 8px 0; }
+            .section-title .badge { font-size:10px; padding:2px 6px; }
+            .data-table { font-size:11px; }
+            .data-table thead th { padding:8px 6px; font-size:10px; }
+            .data-table tbody td { padding:8px 6px; }
+            .insight-card { padding:14px; }
+            .insight-card h4 { font-size:13px; }
+            .insight-card p { font-size:12px; }
+            .verdict-box { padding:16px 12px; }
+            .verdict-box h2 { font-size:18px; }
+            .verdict-box p { font-size:12px; }
+            .funnel-step { gap:8px; padding:8px 0; }
+            .funnel-label { min-width:60px; font-size:10px; }
+            .funnel-stats { min-width:auto; font-size:10px; }
+            .funnel-bar { height:28px; font-size:10px; padding:0 8px; }
+            .funnel-arrow { padding-left:68px; font-size:9px; }
+            .qa-group-header { font-size:12px; padding:8px 12px; }
+            .qa-user-card { padding:12px; }
+            .qa-user-name { font-size:13px; }
+            .qa-user-meta { font-size:11px; }
+            .qa-item { font-size:12px; }
+            .qa-label { padding:6px 8px; min-width:28px; font-size:10px; }
+            .qa-text { padding:6px 10px; font-size:12px; }
+            .qa-intent-badge { font-size:9px; padding:1px 4px; }
+            .qa-quality-badge { font-size:9px; padding:1px 4px; }
+            .qa-summary { font-size:11px; padding:8px 10px; }
+            .qa-group-insight { font-size:11px; padding:10px 12px; }
+            .heatmap-table th { font-size:9px; padding:6px 3px; }
+            .heatmap-table td { font-size:9px; padding:4px 3px; min-width:36px; }
+            .heatmap-table .user-name { font-size:10px; min-width:60px; padding-left:6px; }
         }
         @media print {
             body { background:#fff; color:#111; }
