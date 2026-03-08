@@ -1358,13 +1358,14 @@ function renderSurveyKPI() {
     const container = document.getElementById('survey-kpi');
     const reuseYes = SURVEY.filter(s => s.reuse === '예').length;
     const timeSaveYes = SURVEY.filter(s => s.aiTimeSave === '예').length;
-    const pos = '#0549CC', neg = '#DA4343';
+    const pos = '#0549CC', mid = '#E8A43D', neg = '#DA4343';
+    const kpiColor = v => v > 4 ? pos : v > 3 ? mid : neg;
     const cards = [
-        {label:'전체 만족도', value: SURVEY_AVG.satisfaction.toFixed(2), sub:'5점 만점', color: SURVEY_AVG.satisfaction >= 3.5 ? pos : neg},
-        {label:'서비스 유용성', value: SURVEY_AVG.useful.toFixed(2), sub:'5점 만점', color: SURVEY_AVG.useful >= 3.5 ? pos : neg},
-        {label:'AI 정확도', value: SURVEY_AVG.aiAccuracy.toFixed(2), sub:'5점 만점 — 최저 항목', color: SURVEY_AVG.aiAccuracy >= 3.5 ? pos : neg},
-        {label:'추천 의향', value: SURVEY_AVG.recommend.toFixed(2), sub:'5점 만점', color: SURVEY_AVG.recommend >= 3.5 ? pos : neg},
-        {label:'재사용 의향', value: `${((reuseYes/SURVEY.length)*100).toFixed(1)}%`, sub:`${reuseYes}/${SURVEY.length}명 긍정`, color: reuseYes/SURVEY.length >= 0.7 ? pos : neg},
+        {label:'전체 만족도', value: SURVEY_AVG.satisfaction.toFixed(2), sub:'5점 만점', color: kpiColor(SURVEY_AVG.satisfaction)},
+        {label:'서비스 유용성', value: SURVEY_AVG.useful.toFixed(2), sub:'5점 만점', color: kpiColor(SURVEY_AVG.useful)},
+        {label:'AI 정확도', value: SURVEY_AVG.aiAccuracy.toFixed(2), sub:'5점 만점 — 최저 항목', color: kpiColor(SURVEY_AVG.aiAccuracy)},
+        {label:'추천 의향', value: SURVEY_AVG.recommend.toFixed(2), sub:'5점 만점', color: kpiColor(SURVEY_AVG.recommend)},
+        {label:'재사용 의향', value: `${((reuseYes/SURVEY.length)*100).toFixed(1)}%`, sub:`${reuseYes}/${SURVEY.length}명 긍정`, color: pos},
     ];
     container.innerHTML = cards.map(c => `
         <div class="kpi-card">
@@ -1485,28 +1486,29 @@ function renderSurveyTable() {
     html += '<th>응답자</th><th>제출일</th><th>만족도</th><th>유용성</th><th>AI정확도</th><th>시간절약</th><th>기업정보</th><th>추천</th><th>재사용</th>';
     html += '</tr></thead><tbody>';
     SURVEY.forEach(s => {
-        const scoreColor = v => v >= 4 ? '#0549CC' : '#DA4343';
+        const scoreColor = v => v > 4 ? '#0549CC' : v > 3 ? '#E8A43D' : '#DA4343';
         html += `<tr>
             <td style="font-weight:600">${s.name}</td>
             <td>${s.date}</td>
             <td style="color:${scoreColor(s.satisfaction)};font-weight:700">${s.satisfaction}</td>
             <td style="color:${scoreColor(s.useful)};font-weight:700">${s.useful}</td>
             <td style="color:${scoreColor(s.aiAccuracy)};font-weight:700">${s.aiAccuracy}</td>
-            <td>${s.aiTimeSave === '예' ? '<span style="color:#0549CC">예</span>' : s.aiTimeSave === '아니오' ? '<span style="color:#DA4343">아니오</span>' : '<span style="color:#868E96">미이용</span>'}</td>
+            <td>${s.aiTimeSave === '예' ? '<span style="color:#E8A43D">예</span>' : s.aiTimeSave === '아니오' ? '<span style="color:#DA4343">아니오</span>' : '<span style="color:#868E96">미이용</span>'}</td>
             <td style="color:${scoreColor(s.companyInfo)};font-weight:700">${s.companyInfo}</td>
             <td style="color:${scoreColor(s.recommend)};font-weight:700">${s.recommend}</td>
             <td>${s.reuse === '예' ? '<span style="color:#0549CC">예</span>' : '<span style="color:#DA4343">아니오</span>'}</td>
         </tr>`;
     });
     // Average row
+    const avgColor = v => v > 4 ? '#0549CC' : v > 3 ? '#E8A43D' : '#DA4343';
     html += `<tr style="border-top:2px solid #DEE2E6;font-weight:700">
         <td>평균</td><td>-</td>
-        <td style="color:#0549CC">${SURVEY_AVG.satisfaction.toFixed(2)}</td>
-        <td style="color:#0549CC">${SURVEY_AVG.useful.toFixed(2)}</td>
-        <td style="color:#DA4343">${SURVEY_AVG.aiAccuracy.toFixed(2)}</td>
-        <td style="color:#0549CC">50%</td>
-        <td style="color:#0549CC">${SURVEY_AVG.companyInfo.toFixed(2)}</td>
-        <td style="color:#0549CC">${SURVEY_AVG.recommend.toFixed(2)}</td>
+        <td style="color:${avgColor(SURVEY_AVG.satisfaction)}">${SURVEY_AVG.satisfaction.toFixed(2)}</td>
+        <td style="color:${avgColor(SURVEY_AVG.useful)}">${SURVEY_AVG.useful.toFixed(2)}</td>
+        <td style="color:${avgColor(SURVEY_AVG.aiAccuracy)}">${SURVEY_AVG.aiAccuracy.toFixed(2)}</td>
+        <td style="color:#E8A43D">50%</td>
+        <td style="color:${avgColor(SURVEY_AVG.companyInfo)}">${SURVEY_AVG.companyInfo.toFixed(2)}</td>
+        <td style="color:${avgColor(SURVEY_AVG.recommend)}">${SURVEY_AVG.recommend.toFixed(2)}</td>
         <td style="color:#0549CC">83.3%</td>
     </tr>`;
     html += '</tbody></table>';
