@@ -530,11 +530,11 @@
             <h2>CONDITIONAL GO</h2>
             <p>서비스 수요와 사용 의지는 확인되었으나, AI 답변 품질(3.00/5)이 핵심 리스크. AI 정확도 개선 + 온보딩 퍼널 최적화 후 Open Beta 진행 권고.</p>
         </div>
-        <div class="section-title">강점 (Strengths)</div>
+        <div class="section-title">Go 근거 — 서비스 수요는 확인됨</div>
         <div class="insight-row" id="strengths"></div>
-        <div class="section-title">개선 필요 (Areas for Improvement)</div>
+        <div class="section-title">Conditional 근거 — AI 품질이 핵심 리스크</div>
         <div class="insight-row" id="improvements"></div>
-        <div class="section-title">Open Beta 진행 조건</div>
+        <div class="section-title">Open Beta 필수 조건</div>
         <div class="insight-row" id="conditions"></div>
     </div>
 
@@ -1575,15 +1575,15 @@ function renderSurveyQueryAnalysis() {
 
 function renderGoNoGo() {
     document.getElementById('strengths').innerHTML = [
-        {title:'사용 빈도는 높지만, 답변 품질이 관건', text:'AI 사용자 인당 5.6회, 3회+ 사용률 87.5%로 반복 사용 의지 확인. 다만 설문 AI 정확도 3.00/5점으로, 많이 써봤지만 "만족스럽지 않았다"는 시그널. 사용 빈도와 품질 만족도 사이의 괴리 해소가 핵심.'},
-        {title:'인물 검색 수요 확인, 답변 품질은 미달', text:'전체 외부 질의의 39%가 person_search로 "내 인맥에서 적합한 사람 찾기" 수요 입증. 그러나 회사명/브랜드명 불일치, 비상장 기업 정보 부재로 실제 답변이 기대에 미치지 못하는 사례 다수. 수요는 확인했으나 Value Delivery는 미완성.'},
-        {title:'재사용 의향 85.7% — AI 정확도 불만에도 서비스 니즈 확인', text:'7명 중 6명이 재사용 의향 긍정. AI 정확도에 불만(3.00점)이 있음에도 서비스 컨셉 자체에 대한 니즈 확인. "아이디어는 좋은데 실행이 아직" 상태.'},
+        {title:'서비스 컨셉에 대한 수요 확인', text:'재사용 의향 85.7%(7명 중 6명), 인터뷰 참여 의향 100%. AI 정확도 불만(3.00점)에도 서비스 자체에 대한 니즈를 인정. "AI 명함 관리" 컨셉은 시장에서 통한다.'},
+        {title:'인물 검색 핵심 수요 입증', text:'전체 외부 질의의 39%가 person_search — "내 인맥에서 적합한 사람 찾기"가 가장 강한 사용 동기. AI 3회+ 사용률 87.5%로 반복 시도 의지도 확인.'},
+        {title:'명함 업로드→AI 사용 자연 전환', text:'명함 업로드 완료자 13명 중 12명(92%)이 AI 사용. 업로드만 유도하면 AI 사용으로 자연 전환되는 구조 확인. Aha Moment의 핵심 선행 조건.'},
     ].map(i => `<div class="insight-card positive"><h4>${i.title}</h4><p>${i.text}</p></div>`).join('');
 
     document.getElementById('improvements').innerHTML = [
-        {title:'AI 정확도 개선 최우선 (3.00/5점)', text:'설문 전 항목 중 최저. 최규민 1점, 이주형·최유정 2점. 회사명/브랜드명 불일치 시 검색 불가, 비상장 기업 정보 부재. AI가 가치를 전달하지 못하면 사용 빈도 자체가 무의미.'},
-        {title:'극심한 D4+ 리텐션 드롭', text:'D1~D3 질의 61건(69%) → D4 이후 일 평균 3.5건. 초기 호기심 후 지속적 가치 전달 실패. AI 답변 품질 미달이 재방문 동기 부재의 근본 원인일 가능성.'},
-        {title:'온보딩·명함 업로드 퍼널 미달', text:'CBT 기획서 온보딩 목표 90% 대비 실적 67.9%, 업로드 목표 80% 대비 46.4%. 핵심 전환 지표가 모두 목표 미달. 명함 업로드 없이는 AI 가치 경험 불가.'},
+        {title:'AI 정확도 3.00/5 — 설문 전 항목 최저', text:'최규민 1점, 이주형·최유정 2점. 삼성전자 매출 "106억원" 오답, 자사 정보 조회 불가, 첫 질의 out_of_scope 처리 등 AI가 기대를 배신한 경험이 저점수의 직접 원인. 수요는 있지만 Value Delivery가 미완성.'},
+        {title:'극심한 D4+ 리텐션 드롭', text:'D1~D3 질의 61건(69%) → D4 이후 일 평균 3.5건. 초기 호기심 후 재방문 동기 부재. AI 답변 품질 미달이 리텐션 실패의 근본 원인.'},
+        {title:'온보딩·명함 업로드 퍼널 미달', text:'CBT 기획서 온보딩 목표 90% 대비 실적 67.9%, 업로드 목표 80% 대비 46.4%. 명함 업로드 없이는 AI 가치 경험 불가 — 퍼널 초입에서 이미 이탈.'},
     ].map(i => `<div class="insight-card negative"><h4>${i.title}</h4><p>${i.text}</p></div>`).join('');
 
     document.getElementById('conditions').innerHTML = [
