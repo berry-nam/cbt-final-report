@@ -1293,7 +1293,7 @@ function renderKPITargets() {
     container.innerHTML = KPIS.map(k => {
         const pct = Math.min(100, (k.actual / k.target) * 100);
         const achieved = k.actual >= k.target;
-        const color = achieved ? 'var(--positive)' : pct >= 50 ? 'var(--warning)' : 'var(--negative)';
+        const color = achieved ? '#0549CC' : pct >= 50 ? '#E8A43D' : '#DA4343';
         return `
         <div class="kpi-card">
             <div class="kpi-icon" style="font-size:24px">${k.icon}</div>
@@ -1309,6 +1309,8 @@ function renderKPITargets() {
 function renderKPIRadar() {
     const ctx = document.getElementById('chart-kpi-radar').getContext('2d');
     const achievementRates = KPIS.map(k => Math.min(150, (k.actual / k.target) * 100));
+    const kpiPtColor = r => r >= 100 ? '#0549CC' : r >= 50 ? '#E8A43D' : '#DA4343';
+    const kpiPtColors = achievementRates.map(kpiPtColor);
     window._charts.kpiRadar = new Chart(ctx, {
         type: 'radar',
         data: {
@@ -1317,11 +1319,13 @@ function renderKPIRadar() {
                 {
                     label: '달성률 (%)',
                     data: achievementRates,
-                    borderColor: '#0549CC',
-                    backgroundColor: '#0549CC33',
+                    borderColor: '#86868680',
+                    backgroundColor: '#86868815',
                     borderWidth: 2,
-                    pointRadius: 5,
-                    pointBackgroundColor: '#0549CC',
+                    pointRadius: 8,
+                    pointBackgroundColor: kpiPtColors,
+                    pointBorderColor: kpiPtColors,
+                    pointBorderWidth: 2,
                 },
                 {
                     label: '목표 (100%)',
@@ -1344,7 +1348,7 @@ function renderKPIRadar() {
                     max: 150,
                     ticks: { stepSize:50, color:'#868E96', backdropColor:'transparent' },
                     grid: { color:'#E9ECEF' },
-                    pointLabels: { color:'#495057', font:{size:11} },
+                    pointLabels: { color: kpiPtColors, font:{size:11, weight:'bold'} },
                     angleLines: { color:'#E9ECEF' }
                 }
             }
