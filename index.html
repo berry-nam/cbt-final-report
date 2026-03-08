@@ -1381,6 +1381,8 @@ function renderSurveyRadar() {
     const ctx = document.getElementById('chart-survey-radar').getContext('2d');
     const dims = ['전체 만족도','서비스 유용성','AI 정확도','기업정보 유용성','추천 의향'];
     const avgs = [SURVEY_AVG.satisfaction, SURVEY_AVG.useful, SURVEY_AVG.aiAccuracy, SURVEY_AVG.companyInfo, SURVEY_AVG.recommend];
+    const ptColor = v => v > 4 ? '#0549CC' : v > 3 ? '#E8A43D' : '#DA4343';
+    const ptColors = avgs.map(ptColor);
     window._charts.surveyRadar = new Chart(ctx, {
         type: 'radar',
         data: {
@@ -1389,11 +1391,13 @@ function renderSurveyRadar() {
                 {
                     label: '평균 점수',
                     data: avgs,
-                    borderColor: '#0549CC',
-                    backgroundColor: '#0549CC33',
+                    borderColor: '#86868680',
+                    backgroundColor: '#86868815',
                     borderWidth: 2,
-                    pointRadius: 6,
-                    pointBackgroundColor: '#0549CC',
+                    pointRadius: 8,
+                    pointBackgroundColor: ptColors,
+                    pointBorderColor: ptColors,
+                    pointBorderWidth: 2,
                 },
                 {
                     label: '만점 (5.0)',
