@@ -316,8 +316,8 @@
                 <canvas id="chart-daily-overview"></canvas>
             </div>
             <div class="chart-container">
-                <h3>플랫폼 DAU 추이 (Amplitude)</h3>
-                <div class="chart-desc">전체 플랫폼 일간 활성 사용자</div>
+                <h3>CBT 참여자 일별 활동 추이</h3>
+                <div class="chart-desc">CBT 수락자 28명 중 당일 활동 사용자 vs AI 질의 수</div>
                 <canvas id="chart-dau"></canvas>
             </div>
         </div>
@@ -352,11 +352,11 @@
         <div class="chart-row">
             <div class="chart-container">
                 <h3>CBT 핵심 퍼널</h3>
-                <div class="chart-desc">가입 → 명함 업로드 → AI 사용 → 재방문</div>
+                <div class="chart-desc">수락 → 온보딩 → 명함 업로드 → AI 사용</div>
                 <div id="funnel-viz"></div>
             </div>
             <div class="chart-container">
-                <h3>퍼널 전환율 비교</h3>
+                <h3>퍼널 단계별 전환율</h3>
                 <div class="chart-desc">각 단계별 전환율 (%) — 바 차트</div>
                 <canvas id="chart-funnel-bars"></canvas>
             </div>
@@ -377,6 +377,13 @@
 
     <!-- TAB 4: AI ANALYSIS -->
     <div id="tab-ai" class="tab-content">
+        <div style="background:#FCF0F0;border:1px solid #DA4343;border-radius:var(--radius);padding:16px 20px;margin-bottom:var(--gap);display:flex;align-items:flex-start;gap:12px">
+            <span style="font-size:20px">⚠️</span>
+            <div>
+                <div style="font-weight:700;color:#DA4343;margin-bottom:4px">답변 퀄리티 보장 안됨 — AI 응답 정확도 주의</div>
+                <div style="font-size:13px;color:#495057">설문 AI 정확도 평가 <strong>3.00/5점</strong> (7명 응답 중 최저 항목). person_search(39%)가 킬러 유즈케이스로 확인되었으나, 실제 AI 답변의 정확도·품질은 사용자 기대에 미달. 회사명/브랜드명 불일치, 비상장 기업 정보 부재 등 구조적 한계 존재. 아래 데이터는 <strong>사용 행태(quantity)</strong>를 보여줄 뿐, <strong>답변 품질(quality)</strong>을 보장하지 않음.</div>
+            </div>
+        </div>
         <div class="section-title">AgentQueryLog 전수 분석 <span class="badge">230건</span></div>
         <div class="kpi-row" id="agent-log-summary"></div>
         <div class="chart-row">
@@ -442,7 +449,7 @@
     <div id="tab-recommendation" class="tab-content">
         <div class="verdict-box">
             <h2>CONDITIONAL GO</h2>
-            <p>CBT 데이터 + 설문 기반 분석 결과, 조건부 진행(Open Beta) 권고</p>
+            <p>서비스 수요와 사용 의지는 확인되었으나, AI 답변 품질(3.00/5)이 핵심 리스크. AI 정확도 개선 + 온보딩 퍼널 최적화 후 Open Beta 진행 권고.</p>
         </div>
         <div class="section-title">강점 (Strengths)</div>
         <div class="insight-row" id="strengths"></div>
@@ -453,7 +460,7 @@
     </div>
 
     <footer class="dashboard-footer">
-        CookieDeal CBT Final Report v2 | Data as of: 2026-03-07 (D11) | Sources: Notion (CBT 진행 인원 DB) + MongoDB (AgentQueryLog 230건) + Amplitude + 설문 (6명)
+        CookieDeal CBT Final Report v2 | Data as of: 2026-03-07 (D11) | Sources: Notion (CBT 진행 인원 DB) + MongoDB (AgentQueryLog 230건) + Amplitude + 설문 (7명)
     </footer>
 </div>
 
@@ -478,8 +485,8 @@ const AI_QUERIES_DAILY = [28, 25, 8, 1, 4, 0, 3, 2, 9, 6, 3];
 // Daily AI queries — internal
 const AI_QUERIES_INTERNAL = [52, 14, 6, 4, 0, 28, 3, 7, 0, 0, 0];
 
-// Platform DAU (Amplitude — all users)
-const DAU = [2014, 1933, 1625, 725, 721, 893, 1729, 1883, 1821, 1823, 731];
+// CBT 참여자 일별 활동 (CBT 수락자 28명 중 당일 활동 사용자 수 — 가입+AI 합산 유니크)
+const CBT_ACTIVE_DAILY = [12, 9, 4, 1, 1, 1, 2, 2, 2, 3, 1];
 
 // Intent distribution (external only, total 89)
 const INTENTS = {
@@ -505,22 +512,22 @@ const INTENT_BY_DAY = {
 
 // User activity heatmap: D11 column added
 const USERS = [
-    {name:'서지은', queries:[8,1,0,0,0,0,0,0,0,0,0], segment:'Medium', total:9, days:2, company:'외부'},
-    {name:'홍성빈', queries:[5,0,0,0,0,0,0,0,0,0,0], segment:'Light', total:5, days:1, company:'외부'},
-    {name:'이재용', queries:[3,4,1,0,0,0,3,0,0,0,0], segment:'Heavy', total:11, days:4, company:'외부'},
-    {name:'양준철', queries:[3,0,0,0,0,0,0,0,0,0,0], segment:'Light', total:3, days:1, company:'외부'},
-    {name:'최규민', queries:[2,0,0,0,0,0,0,0,0,1,0], segment:'Medium', total:3, days:2, company:'외부'},
-    {name:'임채이', queries:[2,3,0,0,0,0,0,1,0,0,0], segment:'Heavy', total:6, days:3, company:'외부'},
-    {name:'김현태', queries:[0,8,3,0,0,0,0,0,0,0,0], segment:'Medium', total:11, days:2, company:'외부'},
-    {name:'최은수', queries:[0,4,0,0,0,0,0,0,0,0,0], segment:'Light', total:4, days:1, company:'외부'},
-    {name:'윤성용', queries:[0,3,2,0,0,0,0,0,0,0,0], segment:'Medium', total:5, days:2, company:'외부'},
-    {name:'최유정', queries:[0,2,0,0,0,0,0,0,0,0,0], segment:'Light', total:2, days:1, company:'외부'},
-    {name:'이주형', queries:[0,2,0,0,0,0,0,0,0,1,0], segment:'Medium', total:3, days:2, company:'외부'},
-    {name:'김범석', queries:[0,2,3,0,0,0,0,0,0,0,0], segment:'Medium', total:5, days:2, company:'외부'},
-    {name:'이요한', queries:[0,0,0,0,0,4,0,0,0,0,0], segment:'Light', total:4, days:1, company:'외부'},
-    {name:'치재원', queries:[0,0,0,0,0,0,0,1,0,0,0], segment:'Light', total:1, days:1, company:'Datadog'},
-    {name:'김은지', queries:[0,0,0,0,0,0,0,0,6,0,3], segment:'Medium', total:9, days:2, company:'GenStar'},
-    {name:'이민용', queries:[0,0,0,0,0,0,0,0,3,0,0], segment:'Light', total:3, days:1, company:'외부'},
+    {name:'서지은', queries:[8,1,0,0,0,0,0,0,0,0,0], segment:'Medium', total:9, days:2, company:'Persona.ly'},
+    {name:'홍성빈', queries:[5,0,0,0,0,0,0,0,0,0,0], segment:'Light', total:5, days:1, company:'초'},
+    {name:'이재용', queries:[3,4,1,0,0,0,3,0,0,0,0], segment:'Heavy', total:11, days:4, company:'리뉴어스랩'},
+    {name:'양준철', queries:[3,0,0,0,0,0,0,0,0,0,0], segment:'Light', total:3, days:1, company:'온오프믹스'},
+    {name:'최규민', queries:[2,0,0,0,0,0,0,0,0,1,0], segment:'Medium', total:3, days:2, company:'Snowflake'},
+    {name:'임채이', queries:[2,3,0,0,0,0,0,1,0,0,0], segment:'Heavy', total:6, days:3, company:'Finger inc'},
+    {name:'김현태', queries:[0,8,3,0,0,0,0,0,0,0,0], segment:'Medium', total:11, days:2, company:'월드클래스부동산'},
+    {name:'최은수', queries:[0,4,0,0,0,0,0,0,0,0,0], segment:'Light', total:4, days:1, company:'서치라이트'},
+    {name:'윤성용', queries:[0,3,2,0,0,0,0,0,0,0,0], segment:'Medium', total:5, days:2, company:'강남 디벨롭퍼스'},
+    {name:'최유정', queries:[0,2,0,0,0,0,0,0,0,0,0], segment:'Light', total:2, days:1, company:'ZUZU(코드박스)'},
+    {name:'이주형', queries:[0,2,0,0,0,0,0,0,0,1,0], segment:'Medium', total:3, days:2, company:'트래블월렛'},
+    {name:'김범석', queries:[0,2,3,0,0,0,0,0,0,0,0], segment:'Medium', total:5, days:2, company:'빅거츠'},
+    {name:'이요한', queries:[0,0,0,0,0,4,0,0,0,0,0], segment:'Light', total:4, days:1, company:'SIDE X SIDE'},
+    {name:'지재원', queries:[0,0,0,0,0,0,0,1,0,0,0], segment:'Light', total:1, days:1, company:'데이터독'},
+    {name:'김은지', queries:[0,0,0,0,0,0,0,0,6,0,3], segment:'Medium', total:9, days:2, company:'젠스타메이트'},
+    {name:'이민용', queries:[0,0,0,0,0,0,0,0,3,0,0], segment:'Light', total:3, days:1, company:'스위스 연방 교육연구혁신청'},
 ];
 
 // Card upload data
@@ -547,16 +554,17 @@ const FUNNEL = [
     {step:'CBT 링크 수락', count:28, rate:100},
     {step:'온보딩 완료', count:19, rate:67.9},
     {step:'명함 업로드', count:13, rate:46.4},
-    {step:'AI 기능 사용', count:12, rate:42.9},
+    {step:'AI 기능 사용', count:16, rate:57.1},
 ];
 
 // KPI targets & actuals (updated: 89 queries / 16 users = 5.6)
 const KPIS = [
-    {id:'kpi1', label:'CBT 참여율', desc:'가입 대비 명함 업로드', target:30, actual:46.4, unit:'%', icon:'📊'},
-    {id:'kpi2', label:'AI 기능 사용률', desc:'가입 대비 AI 질의 1회+', target:20, actual:42.9, unit:'%', icon:'🤖'},
-    {id:'kpi3', label:'온보딩 완료율', desc:'CBT 수락자 중 온보딩 완료', target:70, actual:67.9, unit:'%', icon:'🔄'},
-    {id:'kpi4', label:'평균 AI 질의 수', desc:'AI 사용자 인당 평균 (16명)', target:3, actual:5.6, unit:'회', icon:'💬'},
-    {id:'kpi5', label:'AI 3회+ 사용률', desc:'AI 사용자 중 3회 이상', target:40, actual:87.5, unit:'%', icon:'⭐'},
+    {id:'kpi1', label:'온보딩 완료율', desc:'CBT 기획서 목표: ≥90%', target:90, actual:67.9, unit:'%', icon:'🔄'},
+    {id:'kpi2', label:'명함 업로드 완료율', desc:'CBT 기획서 목표: ≥80%', target:80, actual:46.4, unit:'%', icon:'📊'},
+    {id:'kpi3', label:'AI 3회+ 사용률', desc:'CBT 기획서 목표: ≥70%', target:70, actual:87.5, unit:'%', icon:'🤖'},
+    {id:'kpi4', label:'기능 만족도', desc:'CBT 기획서 목표: ≥3.5/5 (=7/10)', target:3.5, actual:3.57, unit:'점', icon:'⭐'},
+    {id:'kpi5', label:'시간 절약 동의율', desc:'CBT 기획서 목표: ≥70%', target:70, actual:57.1, unit:'%', icon:'⏱️'},
+    {id:'kpi6', label:'AI 정확도', desc:'CBT 기획서 목표: ≥3.5/5 (=7/10)', target:3.5, actual:3.00, unit:'점', icon:'🎯'},
 ];
 
 // AgentQueryLog summary
@@ -565,7 +573,7 @@ const AGENT_LOG = {
     external: 89,
     internal: 141,
     period: '2026-02-23 ~ 2026-03-07',
-    internalUsers: ['남승오', '정홍준', '신승민(holden)']
+    internalUsers: ['남승오', '정홍준', '신승민', '류고은', '심정훈', '이기범', '이우진']
 };
 
 // Survey data (6 respondents)
@@ -576,14 +584,15 @@ const SURVEY = [
     {name:'임채이', date:'3/6', satisfaction:4, useful:5, aiAccuracy:3, aiTimeSave:'예', companyInfo:5, recommend:5, reuse:'예', interview:'예'},
     {name:'김은지', date:'3/7', satisfaction:3, useful:4, aiAccuracy:3, aiTimeSave:'예', companyInfo:3, recommend:4, reuse:'예', interview:'예'},
     {name:'최유정', date:'3/7', satisfaction:4, useful:4, aiAccuracy:2, aiTimeSave:'이용안함', companyInfo:3, recommend:4, reuse:'예', interview:'예'},
+    {name:'이재용', date:'3/8', satisfaction:3, useful:3, aiAccuracy:5, aiTimeSave:'예', companyInfo:5, recommend:3, reuse:'예', interview:'예'},
 ];
 
 const SURVEY_AVG = {
-    satisfaction: 3.67,
-    useful: 3.67,
-    aiAccuracy: 2.67,
-    companyInfo: 3.33,
-    recommend: 3.67,
+    satisfaction: 3.57,
+    useful: 3.57,
+    aiAccuracy: 3.00,
+    companyInfo: 3.57,
+    recommend: 3.57,
 };
 
 const COLORS = ['#0549CC','#DE3D82','#0FB5AE','#F68511','#DA4343','#6A93E1','#8B5CF6'];
@@ -614,7 +623,7 @@ function renderKPISummary() {
         {label:'AI 사용자', value:'16', sub:`총 ${totalQ}건 질의 (인당 ${(totalQ/16).toFixed(1)}회)`, change:'57.1% of 외부 사용자', cls:'positive', color:'#DE3D82'},
         {label:'명함 업로드', value:'56,436', sub:'13명 업로더 / 평균 4,341장', change:'13/28 참여 (46.4%)', cls:'positive', color:'#0FB5AE'},
         {label:'온보딩 완료', value:'19', sub:'28명 중 19명 완료 (67.9%)', change:'9명 미완료', cls:'warning', color:'#F68511'},
-        {label:'설문 만족도', value:'3.67', sub:'5점 만점 / 6명 응답', change:'재사용 의향 83.3%', cls:'positive', color:'#8B5CF6'},
+        {label:'설문 만족도', value:'3.57', sub:'5점 만점 / 7명 응답', change:'재사용 의향 85.7%', cls:'positive', color:'#8B5CF6'},
     ];
     container.innerHTML = cards.map(c => `
         <div class="kpi-card">
@@ -677,30 +686,47 @@ function renderDailyOverview() {
 function renderDAU() {
     const ctx = document.getElementById('chart-dau').getContext('2d');
     window._charts.dau = new Chart(ctx, {
-        type: 'line',
+        type: 'bar',
         data: {
             labels: DATES,
-            datasets: [{
-                label: 'Platform DAU',
-                data: DAU,
-                borderColor: '#0FB5AE',
-                backgroundColor: 'rgba(15,181,174,0.1)',
-                borderWidth: 3,
-                pointRadius: 5,
-                pointBackgroundColor: '#0FB5AE',
-                tension: 0.3,
-                fill: true
-            }]
+            datasets: [
+                {
+                    label: 'CBT 활동 사용자',
+                    data: CBT_ACTIVE_DAILY,
+                    backgroundColor: '#0549CC66',
+                    borderColor: '#0549CC',
+                    borderWidth: 1,
+                    borderRadius: 4,
+                    order: 2,
+                    yAxisID: 'y'
+                },
+                {
+                    label: 'AI 질의 수',
+                    data: AI_QUERIES_DAILY,
+                    type: 'line',
+                    borderColor: '#DE3D82',
+                    backgroundColor: '#DE3D8220',
+                    borderWidth: 3,
+                    pointRadius: 5,
+                    pointBackgroundColor: '#DE3D82',
+                    tension: 0.3,
+                    fill: true,
+                    order: 1,
+                    yAxisID: 'y1'
+                }
+            ]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            interaction: { mode:'index', intersect:false },
             plugins: {
-                legend: { display:false },
-                tooltip: { callbacks:{ label: ctx => `DAU: ${ctx.parsed.y.toLocaleString()}명` }}
+                legend: { position:'top', labels:{ usePointStyle:true, padding:16, color:'#868E96' }},
+                tooltip: { callbacks:{ label: ctx => `${ctx.dataset.label}: ${ctx.parsed.y}${ctx.datasetIndex===0?'명':'건'}` }}
             },
             scales: {
-                y: { beginAtZero:false, grid:{color:'#E9ECEF'}, ticks:{color:'#868E96', callback:v=>v.toLocaleString()} },
+                y: { beginAtZero:true, title:{display:true, text:'활동 사용자', color:'#868E96'}, grid:{color:'#E9ECEF'}, ticks:{color:'#868E96'} },
+                y1: { beginAtZero:true, position:'right', title:{display:true, text:'AI 질의 수', color:'#868E96'}, grid:{display:false}, ticks:{color:'#868E96'} },
                 x: { grid:{display:false}, ticks:{color:'#868E96', maxRotation:45} }
             }
         }
@@ -715,7 +741,7 @@ function renderKeyInsights() {
     const insights = [
         {type:'positive', title:'초기 Activation 강력', metric:`D1~D3 핵심 활동 집중 (${d1d3pct}%)`, text:`D1~D3에 전체 AI 질의의 ${d1d3pct}%(${d1d3}/${totalQ}건)가 집중. 초기 온보딩 후 즉시 핵심 기능을 탐색하는 패턴 확인. person_search(39%)가 킬러 유즈케이스로 부상.`},
         {type:'warning', title:'D4 이후 급격한 활동 감소', metric:'주말+주중 드롭', text:'D4(토) 이후 일 평균 AI 질의가 급감. 초기 호기심 후 지속적 가치 전달 메커니즘 부재. Habit Loop 설계 필요.'},
-        {type:'positive', title:'설문: 재사용 의향 83.3%', metric:'6명 중 5명 재사용 희망', text:'설문 응답 6명 중 5명(83.3%)이 재사용 의향 긍정. 서비스 유용성 3.67점. 다만 AI 정확도 2.67점으로 핵심 개선 필요.'}
+        {type:'positive', title:'설문: 재사용 의향 85.7%', metric:'7명 중 6명 재사용 희망', text:'설문 응답 7명 중 6명(85.7%)이 재사용 의향 긍정. 서비스 유용성 3.57점. 다만 AI 정확도 3.00점으로 핵심 개선 필요.'}
     ];
     container.innerHTML = insights.map(i => `
         <div class="insight-card ${i.type}">
@@ -850,9 +876,9 @@ function renderFunnelBars() {
     const ctx = document.getElementById('chart-funnel-bars').getContext('2d');
     const stepConversions = [
         {label:'수락→온보딩', rate: (19/28*100)},
-        {label:'수락→업로드', rate: (13/28*100)},
-        {label:'수락→AI사용', rate: (12/28*100)},
-        {label:'업로드→AI사용', rate: (12/13*100)},
+        {label:'온보딩→명함 업로드', rate: (13/19*100)},
+        {label:'명함 업로드→AI사용', rate: (12/13*100)},
+        {label:'수락→AI사용 (전체)', rate: (16/28*100)},
     ];
     window._charts.funnelBars = new Chart(ctx, {
         type: 'bar',
@@ -1102,7 +1128,7 @@ function renderKPIRadar() {
                 },
                 {
                     label: '목표 (100%)',
-                    data: [100,100,100,100,100],
+                    data: KPIS.map(()=>100),
                     borderColor: '#DA434366',
                     backgroundColor: '#DA434311',
                     borderWidth: 2,
@@ -1275,7 +1301,7 @@ function renderSurveyTable() {
         </tr>`;
     });
     // Average row
-    html += `<tr style="border-top:2px solid rgba(255,255,255,0.1);font-weight:700">
+    html += `<tr style="border-top:2px solid #DEE2E6;font-weight:700">
         <td>평균</td><td>-</td>
         <td style="color:#0549CC">${SURVEY_AVG.satisfaction.toFixed(2)}</td>
         <td style="color:#0549CC">${SURVEY_AVG.useful.toFixed(2)}</td>
@@ -1308,21 +1334,21 @@ function renderSurveyQualitative() {
 
 function renderGoNoGo() {
     document.getElementById('strengths').innerHTML = [
-        {title:'AI 사용자 참여도 최상', text:'AI 사용자 인당 5.6회, 3회+ 사용률 87.5%로 목표(40%) 크게 초과. 핵심 가치를 경험한 사용자의 만족도 높음.'},
-        {title:'인물 검색 = 킬러 유즈케이스', text:'전체 외부 질의의 39%가 person_search. AI 명함 검색이 핵심 가치 제안(Value Proposition)임을 입증.'},
-        {title:'높은 재사용 의향 (83.3%)', text:'설문 응답 6명 중 5명이 재사용 의향 긍정. 서비스 유용성 3.67점, 추천 의향 3.67점으로 양호.'},
+        {title:'사용 빈도는 높지만, 답변 품질이 관건', text:'AI 사용자 인당 5.6회, 3회+ 사용률 87.5%로 반복 사용 의지 확인. 다만 설문 AI 정확도 3.00/5점으로, 많이 써봤지만 "만족스럽지 않았다"는 시그널. 사용 빈도와 품질 만족도 사이의 괴리 해소가 핵심.'},
+        {title:'인물 검색 수요 확인, 답변 품질은 미달', text:'전체 외부 질의의 39%가 person_search로 "내 인맥에서 적합한 사람 찾기" 수요 입증. 그러나 회사명/브랜드명 불일치, 비상장 기업 정보 부재로 실제 답변이 기대에 미치지 못하는 사례 다수. 수요는 확인했으나 Value Delivery는 미완성.'},
+        {title:'재사용 의향 85.7% — AI 정확도 불만에도 서비스 니즈 확인', text:'7명 중 6명이 재사용 의향 긍정. AI 정확도에 불만(3.00점)이 있음에도 서비스 컨셉 자체에 대한 니즈 확인. "아이디어는 좋은데 실행이 아직" 상태.'},
     ].map(i => `<div class="insight-card positive"><h4>${i.title}</h4><p>${i.text}</p></div>`).join('');
 
     document.getElementById('improvements').innerHTML = [
-        {title:'AI 정확도 개선 시급 (2.67점)', text:'설문 최저 항목. 회사명/브랜드명 불일치, 비상장 기업 정보 부재 등. 검색 매칭 로직 및 데이터 커버리지 강화 필요.'},
-        {title:'극심한 D4+ 리텐션 드롭', text:'D4 이후 일 평균 질의 급감. 초기 체험 후 재방문 동기 부재. Push 알림, 주간 리포트 등 Re-engagement 장치 시급.'},
-        {title:'온보딩→AI 전환 갭', text:'온보딩 완료 19명 중 AI 사용 12명(63%). 온보딩 후 핵심 기능까지 도달 경로 개선 필요.'},
+        {title:'AI 정확도 개선 최우선 (3.00/5점)', text:'설문 전 항목 중 최저. 최규민 1점, 이주형·최유정 2점. 회사명/브랜드명 불일치 시 검색 불가, 비상장 기업 정보 부재. AI가 가치를 전달하지 못하면 사용 빈도 자체가 무의미.'},
+        {title:'극심한 D4+ 리텐션 드롭', text:'D1~D3 질의 61건(69%) → D4 이후 일 평균 3.5건. 초기 호기심 후 지속적 가치 전달 실패. AI 답변 품질 미달이 재방문 동기 부재의 근본 원인일 가능성.'},
+        {title:'온보딩·명함 업로드 퍼널 미달', text:'CBT 기획서 온보딩 목표 90% 대비 실적 67.9%, 업로드 목표 80% 대비 46.4%. 핵심 전환 지표가 모두 목표 미달. 명함 업로드 없이는 AI 가치 경험 불가.'},
     ].map(i => `<div class="insight-card negative"><h4>${i.title}</h4><p>${i.text}</p></div>`).join('');
 
     document.getElementById('conditions').innerHTML = [
-        {title:'1. AI 정확도 대폭 개선', text:'회사명 매칭 퍼지 검색, 비상장 기업 데이터 확충, 브랜드명/법인명 매핑. 목표: AI 정확도 설문 2.67 → 4.0+'},
-        {title:'2. Re-engagement 시스템', text:'명함 네트워크 변동 알림, 주간 AI 인사이트 리포트, 미접속 3일 리마인더 등 Push 기반 재방문 유도.'},
-        {title:'3. 핵심 기능 강화', text:'person_search 정확도/속도 최적화. 검색 결과에서 바로 연락/메모 가능한 Action Flow 추가. 명함 스캔(OCR) 지원.'},
+        {title:'1. AI 답변 품질 대폭 개선 (P0)', text:'person_search 매칭 정밀도 향상(퍼지 검색, 브랜드명/법인명 매핑), 비상장 기업 데이터 확충. 사용자가 "이 사람이 맞다"고 느낄 수 있는 수준으로. 목표: AI 정확도 3.00→4.0+'},
+        {title:'2. 온보딩→명함 업로드 전환 개선 (P1)', text:'온보딩 직후 명함 업로드 유도 Step-by-Step 가이드. 업로드 완료가 AI 가치 경험의 선행 조건임을 감안, 업로드율 46.4%→70%+ 달성 필요.'},
+        {title:'3. Re-engagement + 답변 품질 피드백 루프 (P1)', text:'Push 알림, 주간 AI 인사이트 리포트로 재방문 유도. 동시에 AI 답변에 대한 사용자 피드백(좋아요/싫어요)을 수집하여 품질 개선 사이클 구축.'},
     ].map(i => `<div class="insight-card warning"><h4>${i.title}</h4><p>${i.text}</p></div>`).join('');
 }
 
