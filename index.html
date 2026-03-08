@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1" integrity="sha384-jb8JQMbMoBUzgWatfe6COACi2ljcDdZQ2OxczGA3bGNeWe+6DChMTBJemed7ZnvJ" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0" integrity="sha384-cVMg8E3QFwTvGCDuK+ET4PD341jF3W8nO1auiXfuZNQkzbUUiBGLsIQUE+b1mxws" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-sankey@0.12.1"></script>
     <style>
         :root {
             --bg-primary: #ffffff;
@@ -509,9 +510,9 @@
     <div id="tab-funnel" class="tab-content">
         <div class="chart-row">
             <div class="chart-container">
-                <h3>CBT 핵심 퍼널</h3>
-                <div class="chart-desc">수락 → 온보딩 → 명함 업로드 → AI 사용</div>
-                <div id="funnel-viz"></div>
+                <h3>CBT 핵심 퍼널 (Sankey)</h3>
+                <div class="chart-desc">수락 → 온보딩 완료 → 명함 업로드 / AI 사용 (병렬 경로)</div>
+                <div style="height:340px"><canvas id="chart-sankey"></canvas></div>
             </div>
             <div class="chart-container">
                 <h3>퍼널 단계별 전환율</h3>
@@ -849,6 +850,15 @@ const SURVEY_QUERY_ANALYSIS = [
         ],
         summary: '3건 전부 미흡 — CBT 최저 품질. "내 인맥 어떤 수준" 질의를 분석 대신 out_of_scope 처리(첫인상 실패). "통계치" 요청에 총 수(311장) 한 줄만 제공. "연락할 사람 추천"은 100건 중 임의 10명을 추천 근거 없이 제시. 3건 연속 기대 배신 → 1점.'
     },
+    {
+        name: '이민용', aiScore: 2, queryCount: 3, company: '(미상)',
+        queries: [
+            {query:'최근 이직하신 분이 있을까?', answer:'7명 발견 (topScore 55.46, minScore 44.15) — 매우 낮은 매칭 점수, 실제 이직 여부 확인 불가. "라운지 이용해보세요" 제안', intent:'person_search', quality:'poor'},
+            {query:'삼성전자 임원급 연결 가능한 분 찾아줘', answer:'6명 발견 (topScore 88.11) — 삼성전자 관련 임원급 인맥 목록 제공', intent:'person_search', quality:'good'},
+            {query:'그린하우스 관련 스타트업을 소개할 만한 인맥이 있을까?', answer:'10명 발견 (topScore 91.6) — "환경과 스타트업 생태계 전문가" 제시. 실제 그린하우스 관련성 미검증', intent:'person_search', quality:'poor'},
+        ],
+        summary: '3건 전부 person_search. 삼성전자 임원급(6명, topScore 88)은 양호하나, "이직자 찾기"는 topScore 55로 관련성 의문. 그린하우스 스타트업 질의는 10명 제시했으나 실제 관련성 미보장. 모든 응답에 "라운지 이용" 보일러플레이트 첨부. 3건 중 1건만 양호 → 2점.'
+    },
 ];
 
 const COLORS = ['#0549CC','#DE3D82','#0FB5AE','#F68511','#DA4343','#6A93E1','#8B5CF6'];
@@ -1129,32 +1139,63 @@ function renderUserTable() {
 }
 
 function renderFunnel() {
-    const container = document.getElementById('funnel-viz');
-    const maxWidth = 100;
-    const colors = ['#0549CC','#DE3D82','#0FB5AE','#8B5CF6'];
-    let html = '<div class="funnel-container">';
-    FUNNEL.forEach((f, i) => {
-        const width = Math.max(20, (f.count / FUNNEL[0].count) * maxWidth);
-        const parentIdx = f.from != null ? f.from : i - 1;
-        const isParallel = f.from != null;
-        // show branch label before first parallel item
-        if (isParallel && (i === 0 || FUNNEL[i-1].from == null)) {
-            html += `<div class="funnel-arrow" style="font-weight:600;color:var(--text-primary)">┣ 병렬 — 명함 업로드 없이도 AI 사용 가능</div>`;
-        }
-        html += `<div class="funnel-step"${isParallel ? ' style="padding-left:20px"' : ''}>
-            <div class="funnel-label">${isParallel ? '├ ' : ''}${f.step}</div>
-            <div class="funnel-bar-wrapper">
-                <div class="funnel-bar" style="width:${width}%;background:${colors[i]}">${f.count}명</div>
-            </div>
-            <div class="funnel-stats">${f.rate}%</div>
-        </div>`;
-        if (i < FUNNEL.length - 1 && !isParallel && FUNNEL[i+1].from == null) {
-            const dropoff = ((1 - FUNNEL[i+1].count / f.count) * 100).toFixed(1);
-            html += `<div class="funnel-arrow">▼ ${dropoff}% 이탈</div>`;
+    const ctx = document.getElementById('chart-sankey').getContext('2d');
+    const colors = {
+        accept: '#0549CC',
+        onboard: '#DE3D82',
+        drop: '#DA4343',
+        both: '#0FB5AE',
+        cardOnly: '#F68511',
+        aiOnly: '#8B5CF6',
+        inactive: '#868E96',
+    };
+    window._charts.sankey = new Chart(ctx, {
+        type: 'sankey',
+        data: {
+            datasets: [{
+                data: [
+                    {from: 'accept', to: 'onboard', flow: 19},
+                    {from: 'accept', to: 'drop', flow: 9},
+                    {from: 'onboard', to: 'both', flow: 12},
+                    {from: 'onboard', to: 'cardOnly', flow: 1},
+                    {from: 'onboard', to: 'aiOnly', flow: 4},
+                    {from: 'onboard', to: 'inactive', flow: 2},
+                ],
+                colorFrom: (c) => colors[c.dataset.data[c.dataIndex].from],
+                colorTo: (c) => colors[c.dataset.data[c.dataIndex].to],
+                colorMode: 'gradient',
+                labels: {
+                    accept: 'CBT 링크 수락 (28명)',
+                    onboard: '온보딩 완료 (19명)',
+                    drop: '미완료 이탈 (9명)',
+                    both: '명함+AI 모두 (12명)',
+                    cardOnly: '명함만 업로드 (1명)',
+                    aiOnly: 'AI만 사용 (4명)',
+                    inactive: '비활성 (2명)',
+                },
+                color: colors,
+                size: 'max',
+                nodeWidth: 20,
+                borderWidth: 0,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {display: false},
+                tooltip: {
+                    callbacks: {
+                        label: function(c) {
+                            const d = c.dataset.data[c.dataIndex];
+                            const l = c.dataset.labels;
+                            return `${l[d.from]} → ${l[d.to]}: ${d.flow}명`;
+                        }
+                    }
+                }
+            }
         }
     });
-    html += '</div>';
-    container.innerHTML = html;
 }
 
 function renderFunnelBars() {
