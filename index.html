@@ -577,12 +577,12 @@
 
     <!-- TAB 5: SURVEY -->
     <div id="tab-survey" class="tab-content">
-        <div class="section-title">CBT 설문조사 결과 <span class="badge">8명 응답</span></div>
+        <div class="section-title">CBT 설문조사 결과 <span class="badge">9명 응답</span></div>
         <div class="kpi-row" id="survey-kpi"></div>
         <div class="chart-row">
             <div class="chart-container">
                 <h3>항목별 평균 점수</h3>
-                <div class="chart-desc">5점 만점 기준 평균 (8명 응답)</div>
+                <div class="chart-desc">5점 만점 기준 평균 (9명 응답)</div>
                 <canvas id="chart-survey-radar"></canvas>
             </div>
             <div class="chart-container">
@@ -621,7 +621,7 @@
     </div>
 
     <footer class="dashboard-footer">
-        CookieDeal CBT Final Report v2 | Data as of: 2026-03-07 (D11) | Sources: Notion (CBT 진행 인원 DB) + MongoDB (AgentQueryLog 230건) + Amplitude + 설문 (8명)
+        CookieDeal CBT Final Report v2 | Data as of: 2026-03-07 (D11) | Sources: Notion (CBT 진행 인원 DB) + MongoDB (AgentQueryLog 230건) + Amplitude + 설문 (9명)
     </footer>
 </div>
 
@@ -739,9 +739,9 @@ const KPIS = [
     {id:'kpi1', label:'온보딩 완료율', desc:'CBT 기획서 목표: ≥90%', target:90, actual:67.9, unit:'%', icon:'🔄'},
     {id:'kpi2', label:'명함 업로드 완료율', desc:'CBT 기획서 목표: ≥80%', target:80, actual:46.4, unit:'%', icon:'📊'},
     {id:'kpi3', label:'AI 3회+ 사용률', desc:'CBT 기획서 목표: ≥70%', target:70, actual:87.5, unit:'%', icon:'🤖'},
-    {id:'kpi4', label:'기능 만족도', desc:'CBT 기획서 목표: ≥3.5/5 (=7/10)', target:3.5, actual:3.50, unit:'점', icon:'⭐'},
+    {id:'kpi4', label:'기능 만족도', desc:'CBT 기획서 목표: ≥3.5/5 (=7/10)', target:3.5, actual:3.33, unit:'점', icon:'⭐'},
     {id:'kpi5', label:'시간 절약 동의율', desc:'CBT 기획서 목표: ≥70%', target:70, actual:50.0, unit:'%', icon:'⏱️'},
-    {id:'kpi6', label:'AI 정확도', desc:'CBT 기획서 목표: ≥3.5/5 (=7/10)', target:3.5, actual:2.88, unit:'점', icon:'🎯'},
+    {id:'kpi6', label:'AI 정확도', desc:'CBT 기획서 목표: ≥3.5/5 (=7/10)', target:3.5, actual:2.89, unit:'점', icon:'🎯'},
 ];
 
 // AgentQueryLog summary
@@ -753,7 +753,7 @@ const AGENT_LOG = {
     internalUsers: ['남승오', '정홍준', '신승민', '류고은', '심정훈', '이기범', '이우진']
 };
 
-// Survey data (7 respondents)
+// Survey data (9 respondents)
 const SURVEY = [
     {name:'최규민', date:'3/6', satisfaction:3, useful:2, aiAccuracy:1, aiTimeSave:'아니오', companyInfo:1, recommend:1, reuse:'아니오', interview:'예'},
     {name:'윤성용', date:'3/6', satisfaction:5, useful:5, aiAccuracy:5, aiTimeSave:'예', companyInfo:5, recommend:5, reuse:'예', interview:'예'},
@@ -763,14 +763,15 @@ const SURVEY = [
     {name:'최유정', date:'3/7', satisfaction:4, useful:4, aiAccuracy:2, aiTimeSave:'이용안함', companyInfo:3, recommend:4, reuse:'예', interview:'예'},
     {name:'이재용', date:'3/8', satisfaction:3, useful:3, aiAccuracy:5, aiTimeSave:'예', companyInfo:5, recommend:3, reuse:'예', interview:'예'},
     {name:'이민용', date:'3/8', satisfaction:3, useful:3, aiAccuracy:2, aiTimeSave:'아니오', companyInfo:2, recommend:3, reuse:'아니오', interview:'아니오'},
+    {name:'김범석', date:'3/9', satisfaction:2, useful:2, aiAccuracy:3, aiTimeSave:'아니오', companyInfo:4, recommend:2, reuse:'아니오', interview:'아니오'},
 ];
 
 const SURVEY_AVG = {
-    satisfaction: 3.50,
-    useful: 3.50,
-    aiAccuracy: 2.88,
-    companyInfo: 3.38,
-    recommend: 3.50,
+    satisfaction: 3.33,
+    useful: 3.33,
+    aiAccuracy: 2.89,
+    companyInfo: 3.44,
+    recommend: 3.33,
 };
 
 const SURVEY_QUERY_ANALYSIS = [
@@ -859,6 +860,11 @@ const SURVEY_QUERY_ANALYSIS = [
         ],
         summary: '3건 전부 person_search. 삼성전자 임원급(6명, topScore 88)은 양호하나, "이직자 찾기"는 topScore 55로 관련성 의문. 그린하우스 스타트업 질의는 10명 제시했으나 실제 관련성 미보장. 모든 응답에 "라운지 이용" 보일러플레이트 첨부. 3건 중 1건만 양호 → 2점.'
     },
+    {
+        name: '김범석', aiScore: 3, queryCount: 0, company: '(미상)',
+        queries: [],
+        summary: 'MongoDB 접속 불가로 실제 질의 데이터 미확인. 설문: AI 정확도 3점(보통), 기업 정보 유용성 4점(양호), 명함 3,000장 보유. 피드백: "알고리즘 고도화가 많이 필요해보입니다. 답답해서 직접 찾았어요." 기업 상세보기(경쟁사 동향)에는 만족했으나, 인맥 검색 품질에 불만. 재사용 의향 없음, 시간 절약 미동의.'
+    },
 ];
 
 const COLORS = ['#0549CC','#DE3D82','#0FB5AE','#F68511','#DA4343','#6A93E1','#8B5CF6'];
@@ -889,7 +895,7 @@ function renderKPISummary() {
         {label:'AI 사용자', value:'16', sub:`총 ${totalQ}건 질의 (인당 ${(totalQ/16).toFixed(1)}회)`, change:'57.1% of 외부 사용자', cls:'positive', color:'#DE3D82', icon:'🤖'},
         {label:'명함 업로드', value:'56,436', sub:'13명 업로더 / 평균 4,341장', change:'13/28 참여 (46.4%)', cls:'positive', color:'#0FB5AE', icon:'📇'},
         {label:'온보딩 완료', value:'19', sub:'28명 중 19명 완료 (67.9%)', change:'9명 미완료', cls:'warning', color:'#F68511', icon:'✅'},
-        {label:'설문 만족도', value:'3.50', sub:'5점 만점 / 8명 응답', change:'재사용 의향 75.0%', cls:'warning', color:'#8B5CF6', icon:'⭐'},
+        {label:'설문 만족도', value:'3.33', sub:'5점 만점 / 9명 응답', change:'재사용 의향 66.7%', cls:'warning', color:'#8B5CF6', icon:'⭐'},
     ];
     container.innerHTML = cards.map(c => `
         <div class="kpi-card">
@@ -1007,7 +1013,7 @@ function renderKeyInsights() {
     const insights = [
         {type:'positive', title:'초기 Activation 강력', metric:`D1~D3 핵심 활동 집중 (${d1d3pct}%)`, text:`D1~D3에 전체 AI 질의의 ${d1d3pct}%(${d1d3}/${totalQ}건)가 집중. 초기 온보딩 후 즉시 핵심 기능을 탐색하는 패턴 확인. person_search(39%)가 킬러 유즈케이스로 부상.`},
         {type:'warning', title:'D4 이후 급격한 활동 감소', metric:'주말+주중 드롭', text:'D4(토) 이후 일 평균 AI 질의가 급감. 초기 호기심 후 지속적 가치 전달 메커니즘 부재. Habit Loop 설계 필요.'},
-        {type:'positive', title:'설문: 재사용 의향 75.0%', metric:'8명 중 6명 재사용 희망', text:'설문 응답 8명 중 6명(75.0%)이 재사용 의향 긍정. 서비스 유용성 3.50점. 다만 AI 정확도 2.88점으로 핵심 개선 필요.'}
+        {type:'positive', title:'설문: 재사용 의향 66.7%', metric:'9명 중 6명 재사용 희망', text:'설문 응답 9명 중 6명(66.7%)이 재사용 의향 긍정. 서비스 유용성 3.33점. 다만 AI 정확도 2.89점으로 핵심 개선 필요.'}
     ];
     container.innerHTML = insights.map(i => `
         <div class="insight-card ${i.type}">
@@ -1684,7 +1690,7 @@ function renderSurveyQueryAnalysis() {
         {label:'5점 — 높은 만족', cls:'score-high', users: SURVEY_QUERY_ANALYSIS.filter(u=>u.aiScore===5),
          insight:'5점 그룹도 company_info/card_list에서 미흡 다수(윤성용 1건, 이재용 5건). 그러나 person_search에서 실질적 비즈니스 인맥 확보(변리사 13건, 자동차부품 14건, 제조업 295건)가 불만을 상쇄. 대규모 명함첩 보유(9,752장/3,021장)가 검색 성공률의 핵심 변수.'},
         {label:'3점 — 보통', cls:'score-mid', users: SURVEY_QUERY_ANALYSIS.filter(u=>u.aiScore===3),
-         insight:'person_search 성공(topScore 90+)과 company_info 전면 실패가 공존. 김은지: 자사+스타벅스 재무 모두 조회 불가, 명함 분석 18분 대기. 임채이: 6건 중 3건이 서비스 안내 — 핵심 기능 미체험. "쓸만한 부분이 있지만 신뢰하기 어렵다"는 양면적 평가.'},
+         insight:'person_search 성공(topScore 90+)과 company_info 전면 실패가 공존. 김은지: 자사+스타벅스 재무 모두 조회 불가, 명함 분석 18분 대기. 임채이: 6건 중 3건이 서비스 안내 — 핵심 기능 미체험. 김범석: 기업 상세보기(경쟁사 동향)에 만족(4점)했으나 인맥 검색 품질 불만("답답해서 직접 찾았어요"). "쓸만한 부분이 있지만 신뢰하기 어렵다"는 양면적 평가.'},
         {label:'1~2점 — 불만족', cls:'score-low', users: SURVEY_QUERY_ANALYSIS.filter(u=>u.aiScore<=2),
          insight:'공통점: 양호 응답 0건. 이주형 — 삼성전자 매출 "106억원" 심각한 오답(실제 258조원), 자사 정보 조회 불가, 검색 결과 부족. 최유정/최규민 — 첫 질의에서 out_of_scope 처리되며 온보딩 실패, AI 핵심 기능 미체험. AI가 "1건도 제대로 답하지 못한" 경험이 저점수의 직접 원인.'},
     ];
@@ -1734,19 +1740,19 @@ function renderSurveyQueryAnalysis() {
 
 function renderGoNoGo() {
     document.getElementById('strengths').innerHTML = [
-        {title:'서비스 컨셉에 대한 수요 확인', text:'재사용 의향 75.0%(8명 중 6명), 인터뷰 참여 의향 87.5%. AI 정확도 불만(2.88점)에도 서비스 자체에 대한 니즈를 인정. "AI 명함 관리" 컨셉은 시장에서 통한다.'},
+        {title:'서비스 컨셉에 대한 수요 확인', text:'재사용 의향 66.7%(9명 중 6명), 인터뷰 참여 의향 77.8%. AI 정확도 불만(2.89점)에도 서비스 자체에 대한 니즈를 인정. "AI 명함 관리" 컨셉은 시장에서 통한다.'},
         {title:'인물 검색 핵심 수요 입증', text:'전체 외부 질의의 39%가 person_search — "내 인맥에서 적합한 사람 찾기"가 가장 강한 사용 동기. AI 3회+ 사용률 87.5%로 반복 시도 의지도 확인.'},
         {title:'명함 업로드→AI 사용 자연 전환', text:'명함 업로드 완료자 13명 중 12명(92%)이 AI 사용. 업로드만 유도하면 AI 사용으로 자연 전환되는 구조 확인. Aha Moment의 핵심 선행 조건.'},
     ].map(i => `<div class="insight-card positive"><h4>${i.title}</h4><p>${i.text}</p></div>`).join('');
 
     document.getElementById('improvements').innerHTML = [
-        {title:'AI 정확도 2.88/5 — 설문 전 항목 최저', text:'최규민 1점, 이주형·최유정·이민용 2점. 삼성전자 매출 "106억원" 오답, 자사 정보 조회 불가, 첫 질의 out_of_scope 처리 등 AI가 기대를 배신한 경험이 저점수의 직접 원인. 수요는 있지만 Value Delivery가 미완성.'},
+        {title:'AI 정확도 2.89/5 — 설문 전 항목 최저', text:'최규민 1점, 이주형·최유정·이민용 2점. 삼성전자 매출 "106억원" 오답, 자사 정보 조회 불가, 첫 질의 out_of_scope 처리 등 AI가 기대를 배신한 경험이 저점수의 직접 원인. 수요는 있지만 Value Delivery가 미완성.'},
         {title:'극심한 D4+ 리텐션 드롭', text:'D1~D3 질의 61건(69%) → D4 이후 일 평균 3.5건. 초기 호기심 후 재방문 동기 부재. AI 답변 품질 미달이 리텐션 실패의 근본 원인.'},
         {title:'온보딩·명함 업로드 퍼널 미달', text:'CBT 기획서 온보딩 목표 90% 대비 실적 67.9%, 업로드 목표 80% 대비 46.4%. 명함 업로드 없이는 AI 가치 경험 불가 — 퍼널 초입에서 이미 이탈.'},
     ].map(i => `<div class="insight-card negative"><h4>${i.title}</h4><p>${i.text}</p></div>`).join('');
 
     document.getElementById('conditions').innerHTML = [
-        {title:'1. AI 답변 품질 대폭 개선 (P0)', text:'person_search 매칭 정밀도 향상(퍼지 검색, 브랜드명/법인명 매핑), 비상장 기업 데이터 확충. 사용자가 "이 사람이 맞다"고 느낄 수 있는 수준으로. 목표: AI 정확도 2.88→4.0+'},
+        {title:'1. AI 답변 품질 대폭 개선 (P0)', text:'person_search 매칭 정밀도 향상(퍼지 검색, 브랜드명/법인명 매핑), 비상장 기업 데이터 확충. 사용자가 "이 사람이 맞다"고 느낄 수 있는 수준으로. 목표: AI 정확도 2.89→4.0+'},
         {title:'2. 온보딩→명함 업로드 전환 개선 (P1)', text:'온보딩 직후 명함 업로드 유도 Step-by-Step 가이드. 업로드 완료가 AI 가치 경험의 선행 조건임을 감안, 업로드율 46.4%→70%+ 달성 필요.'},
         {title:'3. Re-engagement + 답변 품질 피드백 루프 (P1)', text:'Push 알림, 주간 AI 인사이트 리포트로 재방문 유도. 동시에 AI 답변에 대한 사용자 피드백(좋아요/싫어요)을 수집하여 품질 개선 사이클 구축.'},
     ].map(i => `<div class="insight-card warning"><h4>${i.title}</h4><p>${i.text}</p></div>`).join('');
